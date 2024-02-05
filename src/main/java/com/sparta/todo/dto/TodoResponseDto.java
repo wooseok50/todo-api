@@ -21,4 +21,13 @@ public class TodoResponseDto {
         this.content = todo.getContent();
         this.createdAt = todo.getCreatedAt();
     }
+
+    // 댓글 출력 기능 추가
+    public TodoResponseDto(Todo todo, List<CommentResponseDto> commentList) {
+        this.id = todo.getId();
+        this.title = todo.getTitle();
+        this.content = todo.getContent();
+        this.createdAt = todo.getCreatedAt();
+        this.commentList = commentList;
+    }
 }

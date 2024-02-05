@@ -1,7 +1,9 @@
 package com.sparta.todo.service;
 
+import com.sparta.todo.dto.CommentResponseDto;
 import com.sparta.todo.dto.TodoRequestDto;
 import com.sparta.todo.dto.TodoResponseDto;
+import com.sparta.todo.entity.Comment;
 import com.sparta.todo.entity.Todo;
 import com.sparta.todo.entity.User;
 import com.sparta.todo.repository.TodoRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +32,9 @@ public class TodoService {
 
     // Todo 전제 조회
     public List<TodoResponseDto> getTodoList() {
-        return todoRepository.findAllByOrderByCreatedAtDesc().stream().map(TodoResponseDto::new).toList();
+        return todoRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(todo -> new TodoResponseDto(todo, mapToCommentResponseDtoList(todo.getComments())))
+                .collect(Collectors.toList());
     }
 
     // Todo 선택 조회
@@ -37,7 +42,10 @@ public class TodoService {
         Todo todo = todoRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시물이 존재하지 않습니다.")
         );
-        return new TodoResponseDto(todo);
+
+        List<CommentResponseDto> commentList = mapToCommentResponseDtoList(todo.getComments());
+
+        return new TodoResponseDto(todo, commentList);
     }
 
     // Todo 수정
@@ -50,7 +58,9 @@ public class TodoService {
 
         todo.update(requestDto);
 
-        return new TodoResponseDto(todo);
+        List<CommentResponseDto> commentList = mapToCommentResponseDtoList(todo.getComments());
+
+        return new TodoResponseDto(todo, commentList);
     }
 
     // Todo 삭제
@@ -63,4 +73,12 @@ public class TodoService {
 
         todoRepository.delete(todo);
     }
+
+    // Comment 객체 리스트를 CommentResponseDto 객체 리스트로 변환
+    private List<CommentResponseDto> mapToCommentResponseDtoList(List<Comment> comments) {
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
 }
