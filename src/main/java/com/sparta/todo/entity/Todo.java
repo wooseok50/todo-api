@@ -29,13 +29,14 @@ public class Todo extends Timestamped{
     private String content;
 
 
+
     // Todo User 간의 다대일 관계 설정
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     // Todo Comment 간의 일대다 관계 설정
-    @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "todo", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     // todo 작성

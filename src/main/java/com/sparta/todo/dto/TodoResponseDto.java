@@ -4,6 +4,8 @@ import com.sparta.todo.entity.Todo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class TodoResponseDto {
@@ -11,6 +13,7 @@ public class TodoResponseDto {
     private String title;
     private String content;
     private LocalDateTime createdAt;
+    private List<CommentResponseDto> commentList = new ArrayList<>();
 
     public TodoResponseDto(Todo todo) {
         this.id = todo.getId();
