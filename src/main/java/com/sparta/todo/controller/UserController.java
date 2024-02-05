@@ -39,5 +39,4 @@ public class UserController {
 
         return new ResponseStatusDto(Status.SIGNUP_SUCCESS);
     }
-
 }
