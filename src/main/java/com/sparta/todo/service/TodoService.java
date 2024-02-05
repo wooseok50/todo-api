@@ -81,4 +81,17 @@ public class TodoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public TodoResponseDto completeTodo(Long id, User user) {
+
+        Todo todo = todoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
+                () -> new IllegalArgumentException("사용자의 게시글을 찾을 수 없습니다.")
+        );
+
+        todo.setCompleted(true);
+
+        todoRepository.save(todo);
+
+        return new TodoResponseDto(todo);
+    }
 }

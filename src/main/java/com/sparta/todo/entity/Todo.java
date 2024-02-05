@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "todo")
 public class Todo extends Timestamped{
@@ -28,6 +29,8 @@ public class Todo extends Timestamped{
     @Column(name = "contents", nullable = false, length = 500)
     private String content;
 
+    @Column(name = "completed", nullable = false)
+    private boolean isCompleted = false;
 
 
     // Todo User 간의 다대일 관계 설정
@@ -44,6 +47,7 @@ public class Todo extends Timestamped{
         this.username = user.getUsername();
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
+        this.isCompleted = isCompleted();
         this.user = user;
     }
 
@@ -53,5 +57,4 @@ public class Todo extends Timestamped{
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
     }
-
 }

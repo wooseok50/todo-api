@@ -12,6 +12,7 @@ public class TodoResponseDto {
     private Long id;
     private String title;
     private String content;
+    private boolean isCompleted;
     private LocalDateTime createdAt;
     private List<CommentResponseDto> commentList = new ArrayList<>();
 
@@ -20,6 +21,7 @@ public class TodoResponseDto {
         this.title = todo.getTitle();
         this.content = todo.getContent();
         this.createdAt = todo.getCreatedAt();
+        this.isCompleted = todo.isCompleted();
     }
 
     // 댓글 출력 기능 추가
@@ -29,5 +31,7 @@ public class TodoResponseDto {
         this.content = todo.getContent();
         this.createdAt = todo.getCreatedAt();
         this.commentList = commentList;
+        this.isCompleted = todo.isCompleted();
+
     }
 }
