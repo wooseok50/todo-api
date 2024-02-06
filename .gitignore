@@ -26,14 +26,14 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+application.properties
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-application.properties
 
 ### VS Code ###
 .vscode/
