@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -28,7 +28,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복된 username 입니다.");
         }
 
-        // 사용자 등록
         User user = new User(username, password);
         userRepository.save(user);
     }
