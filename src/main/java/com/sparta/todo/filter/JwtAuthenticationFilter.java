@@ -1,14 +1,14 @@
 package com.sparta.todo.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.todo.exception.ResponseStatusDto;
-import com.sparta.todo.exception.Status;
+import com.sparta.todo.response.CommonResponse;
 import com.sparta.todo.user.dto.LoginRequestDto;
+import com.sparta.todo.user.entity.User;
+import com.sparta.todo.user.repository.RefreshTokenRepository;
 import com.sparta.todo.util.JwtUtil;
+import com.sparta.todo.util.RefreshToken;
 import com.sparta.todo.util.UserDetailsImpl;
-import com.sparta.todo.util.UserRoleEnum;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,22 +18,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-// filter단에서 인증 인가 처리
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
         this.jwtUtil = jwtUtil;
-        setFilterProcessesUrl("/api/auth/login");
+        this.refreshTokenRepository = refreshTokenRepository;
+        setFilterProcessesUrl("/auth/login");
     }
 
+
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-            HttpServletResponse response) throws AuthenticationException {
-        log.info("로그인 시도");
+    public Authentication attemptAuthentication(
+            HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
         try {
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
                     LoginRequestDto.class);
@@ -54,35 +56,35 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
             HttpServletResponse response, FilterChain chain, Authentication authResult)
-            throws IOException, ServletException {
-        log.info("로그인 성공 및 JWT 생성");
-        response.setStatus(200); // 인증 성공
-        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRoleEnum role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
+            throws IOException {
+        User user = ((UserDetailsImpl) authResult.getPrincipal()).getUser();
 
-        String token = jwtUtil.createToken(username, role);
-        jwtUtil.addJwtToCookie(token, response);
+        String accessToken = jwtUtil.createAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUsername()).substring(7);
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
+        refreshTokenRepository.save(new RefreshToken(refreshToken, user));
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        String jsonResponse = objectMapper.writeValueAsString(
+                CommonResponse.<Void>builder().message("로그인에 성공하였습니다.").build());
 
         response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-
-        String result = objectMapper.writeValueAsString(
-                new ResponseStatusDto(Status.LOGIN_SUCCESS));
-        response.getWriter().write(result);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
             HttpServletResponse response, AuthenticationException failed)
-            throws IOException, ServletException {
-        log.info("로그인 실패");
-        response.setStatus(401); // 인증 실패
+            throws IOException {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+        String jsonResponse = objectMapper.writeValueAsString(
+                CommonResponse.<Void>builder().message("로그인에 실패하였습니다.").build());
 
         response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-
-        String result = objectMapper.writeValueAsString(
-                new ResponseStatusDto(Status.LOGIN_FAILURE));
-        response.getWriter().write(result);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResponse);
     }
 }
