@@ -1,9 +1,9 @@
 package com.sparta.todo.config;
 
-import com.sparta.todo.jwt.JwtAuthenticationFilter;
-import com.sparta.todo.jwt.JwtAuthorizationFilter;
-import com.sparta.todo.jwt.JwtUtil;
-import com.sparta.todo.security.UserDetailsServiceImpl;
+import com.sparta.todo.filter.JwtAuthenticationFilter;
+import com.sparta.todo.filter.JwtAuthorizationFilter;
+import com.sparta.todo.util.JwtUtil;
+import com.sparta.todo.util.UserDetailsServiceImpl;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,14 +23,16 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
-    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration) {
+    public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService,
+            AuthenticationConfiguration authenticationConfiguration) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+            throws Exception {
         return configuration.getAuthenticationManager();
     }
 
@@ -58,8 +60,10 @@ public class WebSecurityConfig {
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/api/auth/**").permitAll() // '/api/auth/'로 시작하는 요청 모두 접근 허가
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                        .permitAll() // resources 접근 허용 설정
+                        .requestMatchers("/api/auth/**")
+                        .permitAll() // '/api/auth/'로 시작하는 요청 모두 접근 허가
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
