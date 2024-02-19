@@ -1,4 +1,4 @@
-package com.sparta.todo.response;
+package com.sparta.todo.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

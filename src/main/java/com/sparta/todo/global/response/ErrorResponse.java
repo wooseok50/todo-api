@@ -1,4 +1,4 @@
-package com.sparta.todo.response;
+package com.sparta.todo.global.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

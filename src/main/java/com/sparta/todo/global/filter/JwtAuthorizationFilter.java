@@ -1,12 +1,12 @@
-package com.sparta.todo.filter;
+package com.sparta.todo.global.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.todo.response.CommonResponse;
+import com.sparta.todo.global.response.CommonResponse;
+import com.sparta.todo.global.util.JwtUtil;
+import com.sparta.todo.global.util.RefreshToken;
+import com.sparta.todo.global.util.UserDetailsImpl;
+import com.sparta.todo.global.util.UserDetailsServiceImpl;
 import com.sparta.todo.user.repository.RefreshTokenRepository;
-import com.sparta.todo.util.JwtUtil;
-import com.sparta.todo.util.RefreshToken;
-import com.sparta.todo.util.UserDetailsImpl;
-import com.sparta.todo.util.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,9 +1,9 @@
 package com.sparta.todo.comment.entity;
 
 import com.sparta.todo.comment.dto.CommentRequestDto;
+import com.sparta.todo.global.util.Timestamped;
 import com.sparta.todo.todo.entity.Todo;
 import com.sparta.todo.user.entity.User;
-import com.sparta.todo.util.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

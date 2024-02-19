@@ -1,4 +1,4 @@
-package com.sparta.todo.util;
+package com.sparta.todo.global.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

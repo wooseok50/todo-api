@@ -1,7 +1,7 @@
 package com.sparta.todo.user.controller;
 
-import com.sparta.todo.exception.ErrorResponse;
-import com.sparta.todo.response.CommonResponse;
+import com.sparta.todo.global.exception.ErrorResponse;
+import com.sparta.todo.global.response.CommonResponse;
 import com.sparta.todo.user.dto.SignupRequestDto;
 import com.sparta.todo.user.service.AuthService;
 import jakarta.validation.Valid;

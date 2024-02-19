@@ -1,4 +1,4 @@
-package com.sparta.todo.util;
+package com.sparta.todo.global.util;
 
 import com.sparta.todo.user.entity.User;
 import jakarta.persistence.Column;
