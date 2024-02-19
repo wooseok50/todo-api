@@ -21,6 +21,8 @@ public abstract class Timestamped {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
+    // test
+
     @LastModifiedDate // 변경된 시간 저장
     @Column
     @Temporal(TemporalType.TIMESTAMP)
