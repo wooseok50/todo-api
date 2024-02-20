@@ -2,6 +2,7 @@ package com.sparta.todo.todo.service;
 
 import com.sparta.todo.comment.dto.CommentResponseDto;
 import com.sparta.todo.comment.entity.Comment;
+import com.sparta.todo.global.exception.InvalidUserException;
 import com.sparta.todo.todo.dto.TodoRequestDto;
 import com.sparta.todo.todo.dto.TodoResponseDto;
 import com.sparta.todo.todo.entity.Todo;
@@ -19,9 +20,8 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
 
-    // Todo 작성
     @Transactional
-    public TodoResponseDto postTodo(TodoRequestDto requestDto, User user) {
+    public TodoResponseDto postTodo(TodoRequestDto requestDto, User user) throws Exception {
 
         Todo todo = new Todo(requestDto, user);
         Todo saveTodo = todoRepository.save(todo);
@@ -29,7 +29,6 @@ public class TodoService {
         return new TodoResponseDto(saveTodo);
     }
 
-    // Todo 전제 조회
     public List<TodoResponseDto> getTodoList() {
         return todoRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(todo -> new TodoResponseDto(todo,
@@ -37,10 +36,9 @@ public class TodoService {
                 .collect(Collectors.toList());
     }
 
-    // Todo 선택 조회
     public TodoResponseDto getTodo(Long id) {
         Todo todo = todoRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException("게시물이 존재하지 않습니다.")
+                () -> new InvalidUserException("해당 게시물이 존재하지 않습니다.")
         );
 
         List<CommentResponseDto> commentList = mapToCommentResponseDtoList(todo.getComments());
@@ -48,13 +46,10 @@ public class TodoService {
         return new TodoResponseDto(todo, commentList);
     }
 
-    // Todo 수정
     @Transactional
     public TodoResponseDto updateTodo(Long id, TodoRequestDto requestDto, User user) {
 
-        Todo todo = todoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("사용자의 게시글을 찾을 수 없습니다.")
-        );
+        Todo todo = findTodoByIdAndUser(id, user);
 
         todo.update(requestDto);
 
@@ -63,15 +58,29 @@ public class TodoService {
         return new TodoResponseDto(todo, commentList);
     }
 
-    // Todo 삭제
     @Transactional
     public void deleteTodo(Long id, User user) {
 
-        Todo todo = todoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("사용자의 게시글을 찾을 수 없습니다.")
-        );
+        Todo todo = findTodoByIdAndUser(id, user);
 
         todoRepository.delete(todo);
+    }
+
+    @Transactional
+    public TodoResponseDto completeTodo(Long id, User user) {
+
+        Todo todo = findTodoByIdAndUser(id, user);
+
+        todo.setCompleted(true);
+
+        todoRepository.save(todo);
+
+        return new TodoResponseDto(todo);
+    }
+
+    private Todo findTodoByIdAndUser(Long id, User user) {
+        return todoRepository.findByIdAndUserId(id, user.getId())
+                .orElseThrow(() -> new InvalidUserException("해당 사용자의 게시글이 아닙니다."));
     }
 
     // Comment 객체 리스트를 CommentResponseDto 객체 리스트로 변환
@@ -79,19 +88,5 @@ public class TodoService {
         return comments.stream()
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public TodoResponseDto completeTodo(Long id, User user) {
-
-        Todo todo = todoRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("사용자의 게시글을 찾을 수 없습니다.")
-        );
-
-        todo.setCompleted(true);
-
-        todoRepository.save(todo);
-
-        return new TodoResponseDto(todo);
     }
 }

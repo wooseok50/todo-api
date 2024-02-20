@@ -15,6 +15,7 @@ public class TodoResponseDto {
     private String content;
     private boolean isCompleted;
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
     private List<CommentResponseDto> commentList = new ArrayList<>();
 
     public TodoResponseDto(Todo todo) {
@@ -22,6 +23,7 @@ public class TodoResponseDto {
         this.title = todo.getTitle();
         this.content = todo.getContent();
         this.createdAt = todo.getCreatedAt();
+        this.modifiedAt = todo.getModifiedAt();
         this.isCompleted = todo.isCompleted();
     }
 
@@ -31,8 +33,8 @@ public class TodoResponseDto {
         this.title = todo.getTitle();
         this.content = todo.getContent();
         this.createdAt = todo.getCreatedAt();
+        this.modifiedAt = todo.getModifiedAt();
         this.commentList = commentList;
         this.isCompleted = todo.isCompleted();
-
     }
 }

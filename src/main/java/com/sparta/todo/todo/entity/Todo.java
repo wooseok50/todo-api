@@ -1,9 +1,9 @@
 package com.sparta.todo.todo.entity;
 
 import com.sparta.todo.comment.entity.Comment;
+import com.sparta.todo.global.util.Timestamped;
 import com.sparta.todo.todo.dto.TodoRequestDto;
 import com.sparta.todo.user.entity.User;
-import com.sparta.todo.util.Timestamped;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +54,6 @@ public class Todo extends Timestamped {
     @OneToMany(mappedBy = "todo", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    // todo 작성
     public Todo(TodoRequestDto requestDto, User user) {
         this.username = user.getUsername();
         this.title = requestDto.getTitle();
@@ -63,8 +62,6 @@ public class Todo extends Timestamped {
         this.user = user;
     }
 
-    // todo 수정
-    // 게시글 수정
     public void update(TodoRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();

@@ -1,13 +1,13 @@
 package com.sparta.todo.todo.controller;
 
-import com.sparta.todo.exception.ResponseStatusDto;
-import com.sparta.todo.exception.Status;
+import com.sparta.todo.global.response.CommonResponse;
+import com.sparta.todo.global.util.UserDetailsImpl;
 import com.sparta.todo.todo.dto.TodoRequestDto;
 import com.sparta.todo.todo.dto.TodoResponseDto;
 import com.sparta.todo.todo.service.TodoService;
-import com.sparta.todo.util.UserDetailsImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,45 +26,58 @@ public class TodoController {
 
     private final TodoService todoService;
 
-    // Todo 작성
     @PostMapping
-    public ResponseEntity<TodoResponseDto> postTodo(@RequestBody TodoRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(todoService.postTodo(requestDto, userDetails.getUser()));
+    public ResponseEntity<CommonResponse<Void>> postTodo(
+            @RequestBody TodoRequestDto todoRequestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+        todoService.postTodo(todoRequestDto, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.CREATED.value()).body(
+                CommonResponse.<Void>builder().message("todo 생성 완료").build()
+        );
     }
 
-    // todo 전체 조회
     @GetMapping
-    public ResponseEntity<List<TodoResponseDto>> getTodoList() {
-        return ResponseEntity.ok(todoService.getTodoList());
+    public ResponseEntity<CommonResponse<List<TodoResponseDto>>> getTodoList() {
+        List<TodoResponseDto> todoResponseDto = todoService.getTodoList();
+        return ResponseEntity.ok()
+                .body(CommonResponse.<List<TodoResponseDto>>builder()
+                        .data(todoResponseDto).build());
     }
 
-    // todo 선택 조회
     @GetMapping("{id}")
-    public ResponseEntity<TodoResponseDto> getTodo(@PathVariable Long id) {
-        return ResponseEntity.ok((todoService.getTodo(id)));
+    public ResponseEntity<CommonResponse<TodoResponseDto>> getTodo(@PathVariable Long id) {
+        return ResponseEntity.ok()
+                .body(CommonResponse.<TodoResponseDto>builder()
+                        .data(todoService.getTodo(id)).build());
     }
 
-    // todo 수정
     @PutMapping("{id}")
-    public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable Long id,
-            @RequestBody TodoRequestDto requestDto,
+    public ResponseEntity<CommonResponse<TodoResponseDto>> updateTodo(
+            @PathVariable Long id,
+            @RequestBody TodoRequestDto todoRequestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(todoService.updateTodo(id, requestDto, userDetails.getUser()));
+        return ResponseEntity.ok()
+                .body(CommonResponse.<TodoResponseDto>builder()
+                        .data(todoService.updateTodo(id, todoRequestDto, userDetails.getUser()))
+                        .build());
     }
 
-    // todo 삭제
     @DeleteMapping("{id}")
-    public ResponseStatusDto deleteTodo(@PathVariable Long id,
+    public ResponseEntity<CommonResponse<Void>> deleteTodo(
+            @PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         todoService.deleteTodo(id, userDetails.getUser());
-        return new ResponseStatusDto(Status.POST_DELETE);
+        return ResponseEntity.status(HttpStatus.OK.value()).body(
+                CommonResponse.<Void>builder().message("todo 삭제 완료").build());
     }
 
-    // todo 완료 기능 API
+
     @PutMapping("/{id}/complete")
-    public ResponseEntity<TodoResponseDto> completeTodo(@PathVariable Long id,
+    public ResponseEntity<CommonResponse<TodoResponseDto>> completeTodo(@PathVariable Long id,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(todoService.completeTodo(id, userDetails.getUser()));
+        return ResponseEntity.ok()
+                .body(CommonResponse.<TodoResponseDto>builder()
+                        .data(todoService.completeTodo(id, userDetails.getUser()))
+                        .build());
     }
 }
