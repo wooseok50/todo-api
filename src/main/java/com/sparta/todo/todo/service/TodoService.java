@@ -2,6 +2,7 @@ package com.sparta.todo.todo.service;
 
 import com.sparta.todo.comment.dto.CommentResponseDto;
 import com.sparta.todo.comment.entity.Comment;
+import com.sparta.todo.global.exception.InvalidTodoException;
 import com.sparta.todo.global.exception.InvalidUserException;
 import com.sparta.todo.todo.dto.TodoRequestDto;
 import com.sparta.todo.todo.dto.TodoResponseDto;
@@ -81,6 +82,15 @@ public class TodoService {
     private Todo findTodoByIdAndUser(Long id, User user) {
         return todoRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new InvalidUserException("해당 사용자의 게시글이 아닙니다."));
+    }
+
+    public Todo findTodo(Long todoId) {
+        return todoRepository.findById(todoId).orElseThrow(
+                () -> {
+                    String message = "해당 게시글이 없습니다.";
+                    return new InvalidTodoException(message);
+                }
+        );
     }
 
     // Comment 객체 리스트를 CommentResponseDto 객체 리스트로 변환

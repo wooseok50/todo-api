@@ -1,12 +1,14 @@
 package com.sparta.todo.comment.sevice;
 
 import com.sparta.todo.comment.dto.CommentRequestDto;
-import com.sparta.todo.comment.dto.CommentResponseDto;
 import com.sparta.todo.comment.entity.Comment;
 import com.sparta.todo.comment.repository.CommentRepository;
+import com.sparta.todo.global.exception.AuthenticationException;
+import com.sparta.todo.global.exception.InvalidInputException;
 import com.sparta.todo.todo.entity.Todo;
-import com.sparta.todo.todo.repository.TodoRepository;
+import com.sparta.todo.todo.service.TodoService;
 import com.sparta.todo.user.entity.User;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,46 +17,49 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final TodoRepository todoRepository;
+    private final TodoService todoService;
 
-    // Comment 작성
-    public CommentResponseDto todoComment(Long todoId, CommentRequestDto requestDto, User user) {
-        Todo todo = todoRepository.findById(todoId).orElseThrow(
-                () -> new IllegalArgumentException("Todo가 존재하지 않습니다.")
-        );
+    public void todoComment(Long todoId, CommentRequestDto commentRequestDto, User user) {
+        Todo todo = findTodo(todoId);
 
-        Comment comment = new Comment(requestDto, user, todo);
-        Comment saveComment = commentRepository.save(comment);
+        Comment comment = new Comment(commentRequestDto, user, todo);
 
-        return new CommentResponseDto(saveComment);
+        commentRepository.save(comment);
     }
 
-    // Comment 수정
-    public CommentResponseDto updateComment(Long todoId, Long id, CommentRequestDto requestDto,
+    public void updateComment(Long todoId, Long commentId, CommentRequestDto requestDto,
             User user) {
+        findTodo(todoId);
 
-        // todo 존재하는지 확인
-        Todo todo = todoRepository.findById(todoId).orElseThrow(
-                () -> new IllegalArgumentException("Todo가 존재하지 않습니다.")
-        );
-        Comment comment = commentRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("댓글이 존재하지 않습니다.")
-        );
+        Comment comment = findComment(commentId);
 
         comment.update(requestDto);
-
-        return new CommentResponseDto(comment);
     }
 
-    // Comment 삭제
-    public void deleteComment(Long todoId, Long id, User user) {
+    public void deleteComment(Long todoId, Long commentId, User user) {
 
-        Todo todo = todoRepository.findById(todoId).orElseThrow(
-                () -> new IllegalArgumentException("Todo가 존재하지 않습니다.")
-        );
-        Comment comment = commentRepository.findByIdAndUserId(id, user.getId()).orElseThrow(
-                () -> new IllegalArgumentException("댓글이 존재하지 않습니다.")
-        );
+        findTodo(todoId);
+
+        Comment comment = findComment(commentId);
+
+        validate(comment.getUser().getId(), user.getId());
+
         commentRepository.delete(comment);
+    }
+
+    private Todo findTodo(Long todoId) {
+        return todoService.findTodo(todoId);
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new InvalidInputException("해당하는 댓글이 없습니다.")
+        );
+    }
+
+    private void validate(Long originId, Long inputId) {
+        if (!Objects.equals(originId, inputId)) {
+            throw new AuthenticationException("해당 댓글의 작성자가 아닙니다.");
+        }
     }
 }
