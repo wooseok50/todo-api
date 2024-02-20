@@ -1,5 +1,6 @@
 package com.sparta.todo.global.util;
 
+import com.sparta.todo.global.exception.AuthenticationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -87,8 +88,10 @@ public class JwtUtil {
             return 1;
         } catch (UnsupportedJwtException e) {
             log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            throw new AuthenticationException("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
             log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            throw new AuthenticationException("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
         }
         return 2;
     }
