@@ -1,6 +1,7 @@
 package com.sparta.todo.comment.sevice;
 
 import com.sparta.todo.comment.dto.CommentRequestDto;
+import com.sparta.todo.comment.dto.CommentResponseDto;
 import com.sparta.todo.comment.entity.Comment;
 import com.sparta.todo.comment.repository.CommentRepository;
 import com.sparta.todo.global.exception.AuthenticationException;
@@ -8,6 +9,7 @@ import com.sparta.todo.global.exception.InvalidInputException;
 import com.sparta.todo.todo.entity.Todo;
 import com.sparta.todo.todo.service.TodoService;
 import com.sparta.todo.user.entity.User;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,14 @@ public class CommentService {
         Comment comment = new Comment(commentRequestDto, user, todo);
 
         commentRepository.save(comment);
+    }
+
+    public List<CommentResponseDto> getComments(Long todoId) {
+        findTodo(todoId);
+        List<Comment> comments = commentRepository.findAllByTodoId(todoId);
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .toList();
     }
 
     public void updateComment(Long todoId, Long commentId, CommentRequestDto requestDto,
