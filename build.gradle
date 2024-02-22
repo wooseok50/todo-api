@@ -44,6 +44,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    testRuntimeOnly 'com.h2database:h2'
+}
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('test') {

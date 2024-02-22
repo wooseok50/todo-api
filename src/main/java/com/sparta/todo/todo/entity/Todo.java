@@ -19,11 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @Table(name = "todo")
 public class Todo extends Timestamped {
@@ -65,5 +63,9 @@ public class Todo extends Timestamped {
     public void update(TodoRequestDto requestDto) {
         this.title = requestDto.getTitle();
         this.content = requestDto.getContent();
+    }
+
+    public void isChecked() {
+        this.isCompleted = !isCompleted();
     }
 }
