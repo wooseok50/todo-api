@@ -22,7 +22,7 @@ public class TodoService {
     private final TodoRepository todoRepository;
 
     @Transactional
-    public TodoResponseDto postTodo(TodoRequestDto requestDto, User user) throws Exception {
+    public TodoResponseDto postTodo(TodoRequestDto requestDto, User user) {
 
         Todo todo = new Todo(requestDto, user);
         Todo saveTodo = todoRepository.save(todo);
@@ -72,7 +72,7 @@ public class TodoService {
 
         Todo todo = findTodoByIdAndUser(id, user);
 
-        todo.setCompleted(true);
+        todo.isChecked();
 
         todoRepository.save(todo);
 

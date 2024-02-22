@@ -29,7 +29,7 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<CommonResponse<Void>> postTodo(
             @RequestBody TodoRequestDto todoRequestDto,
-            @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         todoService.postTodo(todoRequestDto, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.CREATED.value()).body(
                 CommonResponse.<Void>builder().message("todo 생성 완료").build()
