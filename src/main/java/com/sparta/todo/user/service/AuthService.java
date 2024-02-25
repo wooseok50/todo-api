@@ -1,5 +1,6 @@
 package com.sparta.todo.user.service;
 
+import com.sparta.todo.global.exception.InvalidInputException;
 import com.sparta.todo.user.dto.SignupRequestDto;
 import com.sparta.todo.user.entity.User;
 import com.sparta.todo.user.repository.UserRepository;
@@ -30,5 +31,11 @@ public class AuthService {
 
         User user = new User(username, password);
         userRepository.save(user);
+    }
+
+    public User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new InvalidInputException("해당 User는 존재하지 않습니다.")
+        );
     }
 }
